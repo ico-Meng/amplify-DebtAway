@@ -1,6 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation';
+import {
+    Button,
+    Table,
+    TableRow,
+    TableCell,
+    TableHead,
+    TableBody,
+    Card,
+    View,
+    Flex,
+} from "@aws-amplify/ui-react";
 
 interface Account {
     account_id: string;
@@ -19,8 +31,24 @@ interface Account {
     persistent_account_id: string;
 }
 
+interface Item {
+    item_id: string;
+    webhook: string;
+    error: any; // Replace `any` with the specific type if known, or use `null` for this dataset
+    available_products: string[];
+    billed_products: string[];
+    consent_expiration_time: string | null;
+    update_type: string;
+    auth_method: string;
+    consented_products: string[];
+    institution_id: string;
+    institution_name: string;
+    products: string[];
+}
+
 interface AccountData {
     accounts: Account[];
+    item: Item;
 }
 
 interface ResponseData {
@@ -30,6 +58,17 @@ interface ResponseData {
 
 export default function Balance() {
     const [balance, setBalance] = useState<AccountData | null>(null);
+    const [expandedInstitutions, setExpandedInstitutions] = useState<string[]>([]);
+
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const toggleExpand = () => {
+        setIsExpanded(!isExpanded);
+    };
+
+    const searchParams = useSearchParams();
+    const client_id = searchParams.get('client_id')?.split('=')[1] || null;;
+    console.log("client_id = ", client_id)
 
     useEffect(() => {
         console.log("icoico in balance")
@@ -37,7 +76,6 @@ export default function Balance() {
         if (data) {
             const parsedData: ResponseData = JSON.parse(data);
             setBalance(parsedData.account);
-            //setBalance(JSON.parse(data));
         }
     }, []);
 
@@ -47,61 +85,125 @@ export default function Balance() {
         return <p>Loading balance...</p>;
     }
 
+    const toggleInstitution = (institutionName: string) => {
+        if (expandedInstitutions.includes(institutionName)) {
+            setExpandedInstitutions(expandedInstitutions.filter((name) => name !== institutionName));
+        } else {
+            setExpandedInstitutions([...expandedInstitutions, institutionName]);
+        }
+    };
+
 
     return (
-        <div>
-            <h1>Account Balance</h1>
-            <table
+        <div
+            style={{
+                //background: "linear-gradient(to right, #f0f4f8, #d9e6f2)", // Gradient background
+                //minHeight: "100vh",
+                //padding: "20px",
+                //fontFamily: "Arial, sans-serif",
+                background: "linear-gradient(to right, #f0f4f8, #d9e6f2)", // Gradient background
+                minHeight: "100vh",
+                padding: "20px",
+                fontFamily: "Arial, sans-serif",
+                display: "flex",
+                justifyContent: "center", // Center content horizontally
+                alignItems: "flex-start", // Align content at the top
+            }}
+        >
+            {/* Container with fixed width */}
+            <div
                 style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    marginBottom: "20px",
-                }}
-                border={1}
-            >
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Official Name</th>
-                        <th>Type</th>
-                        <th>Subtype</th>
-                        <th>Available Balance</th>
-                        <th>Current Balance</th>
-                        <th>Currency</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {balance.accounts.map((account) => (
-                        <tr key={account.account_id}>
-                            <td>{account.name}</td>
-                            <td>{account.official_name || "N/A"}</td>
-                            <td>{account.type}</td>
-                            <td>{account.subtype}</td>
-                            <td>{account.balances.available ?? "N/A"}</td>
-                            <td>{account.balances.current ?? "N/A"}</td>
-                            <td>{account.balances.iso_currency_code || "N/A"}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <button
-                onClick={() => {
-                    window.location.href = "/"; // Adjust the URL as per your routing setup
-                }}
-                style={{
-                    position: "fixed",
-                    bottom: "20px",
-                    left: "20px",
-                    backgroundColor: "#333", // Black-grey color
-                    color: "#fff",
-                    border: "none",
-                    padding: "10px 20px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
+                    width: "800px", // Fixed width for consistent layout
+                    maxWidth: "100%", // Ensure it adapts to smaller screens
                 }}
             >
-                Back
-            </button>
+                {/* Expandable Institution Card */}
+                <Card
+                    style={{
+                        marginBottom: "20px",
+                        backgroundColor: "#ffffff", // Light card background
+                        borderRadius: "10px",
+                        padding: "20px",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow
+                    }}
+                >
+                    <Button
+                        style={{
+                            fontSize: "18px",
+                            textAlign: "center",
+                            color: "#333",
+                            width: "100%",
+                            backgroundColor: "transparent",
+                            border: "none",
+                            cursor: "pointer",
+                        }}
+                        onClick={toggleExpand}
+                    >
+                        Institution: {balance.item.institution_name}
+                    </Button>
+                </Card>
+
+                {/* Collapsible Account Balance Details */}
+                {isExpanded && (
+                    <Card
+                        style={{
+                            padding: "20px",
+                            backgroundColor: "#ffffff",
+                            borderRadius: "10px",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                        }}
+                    >
+                        <h2 style={{ color: "#4a4a4a" }}>Account Balance Details</h2>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Official Name</TableCell>
+                                    <TableCell>Type</TableCell>
+                                    <TableCell>Subtype</TableCell>
+                                    <TableCell>Available Balance</TableCell>
+                                    <TableCell>Current Balance</TableCell>
+                                    <TableCell>Currency</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {balance.accounts.map((account) => (
+                                    <TableRow key={account.account_id}>
+                                        <TableCell>{account.name}</TableCell>
+                                        <TableCell>{account.official_name || "N/A"}</TableCell>
+                                        <TableCell>{account.type}</TableCell>
+                                        <TableCell>{account.subtype}</TableCell>
+                                        <TableCell>{account.balances.available ?? "N/A"}</TableCell>
+                                        <TableCell>{account.balances.current ?? "N/A"}</TableCell>
+                                        <TableCell>
+                                            {account.balances.iso_currency_code || "N/A"}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Card>
+                )}
+
+                {/* Back Button */}
+                <Flex justifyContent="flex-start" style={{ marginTop: "20px" }}>
+                    <Button
+                        onClick={() => {
+                            window.location.href = "/"; // Adjust the URL as per your routing setup
+                        }}
+                        variation="primary" // Correct prop for Amplify Button
+                        style={{
+                            position: "fixed",
+                            bottom: "20px",
+                            left: "20px",
+                            backgroundColor: "#333",
+                            color: "#fff",
+                        }}
+                    >
+                        Back
+                    </Button>
+                </Flex>
+            </div>
         </div>
     );
 }

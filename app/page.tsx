@@ -1,160 +1,53 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
 import "./../app/app.css";
-import { Amplify } from "aws-amplify";
-import outputs from "@/amplify_outputs.json";
-import "@aws-amplify/ui-react/styles.css";
-import { Authenticator } from '@aws-amplify/ui-react'
-import { useRouter } from 'next/navigation';
 import '@aws-amplify/ui-react/styles.css'
-import { usePlaidLink } from "react-plaid-link";
 import React from "react";
+import outputs from "@/amplify_outputs.json";
+import type { Schema } from "@/amplify/data/resource";
+import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import { Amplify } from "aws-amplify";
+import { Authenticator } from '@aws-amplify/ui-react'
+import {
+  UserProfile,
+  PlaidIntegration,
+  getAccount,
+  testapi,
+  creditapi,
+  testicoicoapi
+} from "@/app/components/link";
 
 Amplify.configure(outputs);
 
-//const client = generateClient<Schema>();
 
 export default function App() {
-  /*
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }
-
-  useEffect(() => {
-    listTodos();
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
-  }
-
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
-  }
-  */
-
-  const router = useRouter(); // For navigation
-
-  async function callPlaid() {
-    try {
-      console.log("icoico calling api");
-      //const apiEndpoint = "http://127.0.0.1:3000/hello";
-      const apiEndpoint = "http://127.0.0.1:3000/create-link-token";
-      const response = await fetch(apiEndpoint, { method: 'POST' });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch link token: ${response.statusText}`);
-      }
-      console.log("icoico: response = ", response);
-      const data = await response.json();
-      console.log("icoico: data = ", data);
-
-      localStorage.setItem('accountBalance', JSON.stringify(data));
-      console.log("icoico: accountBalance = ", localStorage.getItem('accountBalance'));
-
-      router.push('/balance'); // Navigate to the balance page
-    }
-    catch (error) {
-      console.error("Failed to fetch accountBalance:", error);
-    }
-  }
-
-
-  // Plaid
+  const [userId, setUserId] = useState<string | null>(null);
   const [linkToken, setLinkToken] = useState<string | null>(null);
+  const [publicToken, setPublicToken] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [openPlaidLink, setOpenPlaidLink] = useState<(() => void) | null>(null);
+  const [isPlaidReady, setIsPlaidReady] = useState(false);
 
-  // Fetch the link token from your Lambda backend
-  useEffect(() => {
-    let isMounted = true;
-    const fetchLinkToken = async () => {
-      try {
-        const apiEndpoint = "http://127.0.0.1:3000/create-link-token"; // Replace with your actual API Gateway endpoint
-        const response = await fetch(apiEndpoint, { method: "POST" });
+  const router = useRouter();
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch link token: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        if (isMounted) {
-          setLinkToken(data.link_token); // Set the link_token for Plaid Link
-        }
-      } catch (error) {
-        console.error("Error fetching link token:", error);
-      }
-    };
-
-    fetchLinkToken();
-    return () => {
-      isMounted = false;
-    }
+  const handlePlaidOpen = React.useCallback((open: () => void, ready: boolean) => {
+    setOpenPlaidLink(() => open);
+    setIsPlaidReady(ready);
   }, []);
 
-  // Initialize Plaid Link with the link token
-  const { open, ready } = usePlaidLink({
-    token: linkToken || "",
-    onSuccess: async (publicToken, metadata) => {
-      console.log("Public Token:", publicToken);
-      console.log("Metadata:", metadata);
+  const handleTestApi = React.useCallback(() => {
+    testapi({ clientId, linkToken, publicToken });
+  }, [clientId, linkToken, publicToken]);
 
-      // Send the public token to your Lambda backend to exchange for an access token
-      try {
-        const apiEndpoint = "http://127.0.0.1:3000/exchange-public-token";
-        const response = await fetch(apiEndpoint, {
-          method: "POST",
-          //headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ public_token: publicToken }),
-        });
+  const handleGetAccount = React.useCallback(() => {
+    getAccount({ clientId, linkToken, router });
+  }, [clientId, linkToken]);
 
-        if (!response.ok) {
-          throw new Error(`Failed to exchange public token: ${response.statusText}`);
-        }
+  const handleDebtFormRedirect = () => {
+    router.push("/form");
+  };
 
-        const data = await response.json();
-        console.log("Access Token Response:", data);
-
-        // Store access token or other data if needed
-        localStorage.setItem("accountAccess", JSON.stringify(data));
-
-      } catch (error) {
-        console.error("Error exchanging public token:", error);
-      }
-    },
-    onExit: (error, metadata) => {
-      if (error) {
-        console.error("Plaid Link error:", error);
-      }
-      console.log("User exited Plaid Link:", metadata);
-    },
-  });
-
-  async function getAccount() {
-    try {
-      console.log("icoico calling api");
-      //const apiEndpoint = "http://127.0.0.1:3000/hello";
-      const apiEndpoint = "http://127.0.0.1:3000/get-account";
-      const response = await fetch(apiEndpoint, { method: 'GET' });
-      console.log("icoico: response = ", response);
-
-      const data = await response.json();
-      console.log("icoico: data = ", data);
-
-      localStorage.setItem('accountBalance', JSON.stringify(data));
-      console.log("icoico: accountBalance = ", localStorage.getItem('accountBalance'));
-
-      router.push('/balance'); // Navigate to the balance page
-    }
-    catch (error) {
-      console.error("Failed to fetch accountBalance:", error);
-    }
-  }
 
 
   return (
@@ -168,34 +61,46 @@ export default function App() {
               color: "#000000", // Sea color (Sea Green)
             }}
           >
-            Username: {user?.signInDetails?.loginId || "No user information available"}
+            <UserProfile
+              userId={userId}
+              setUserId={setUserId}
+            />
           </div>
           <br />
-          <button onClick={() => open()} disabled={!ready}>
-            Link with plaid
-          </button>
+          <div>
+            <PlaidIntegration
+              userId={userId}
+              setUserId={setUserId}
+              clientId={clientId}
+              setClientId={setClientId}
+              linkToken={linkToken}
+              setLinkToken={setLinkToken}
+              publicToken={publicToken}
+              setPublicToken={setPublicToken}
+              onOpen={handlePlaidOpen}
+            />
+            <button onClick={() => openPlaidLink && openPlaidLink()} disabled={!isPlaidReady}>
+              Link with Plaid
+            </button>
+          </div>
           <div>
             🥳 Fetch your bank account with Plaid
           </div>
+          <br />
+          <button
+            onClick={handleDebtFormRedirect}
+            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none" >
+            Debt Analysis
+          </button>
 
           <br />
-          <button onClick={getAccount}>Get Account</button>
-          {/*
-          <button onClick={createTodo}>+ new</button>
-          <ul>
-            {todos.map((todo) => (
-              <li onClick={() => deleteTodo(todo.id)}
-                key={todo.id}>{todo.content}</li>
-            ))}
-          </ul>
-          */}
-          <div>
-            🥳 Link your bank account and analyze your debt status
-          </div>
+          <button onClick={handleGetAccount}>Bank Account</button>
+
           <br />
           <br />
           <br />
-          <button onClick={callPlaid}>Test Plaid</button>
+          <button onClick={() => testicoicoapi()}>Test</button>
+          <br />
           <br />
           <button onClick={signOut}>Sign out</button>
         </main>
