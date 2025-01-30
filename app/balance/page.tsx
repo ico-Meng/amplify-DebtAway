@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from "react";
 import {
     Button,
     Table,
@@ -55,8 +56,15 @@ interface ResponseData {
     account: AccountData;
 }
 
+export default function BalancePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <BalancePageContent />
+        </Suspense>
+    );
+}
 
-export default function Balance() {
+function BalancePageContent() {
     const [balance, setBalance] = useState<AccountData | null>(null);
     const [expandedInstitutions, setExpandedInstitutions] = useState<string[]>([]);
 
