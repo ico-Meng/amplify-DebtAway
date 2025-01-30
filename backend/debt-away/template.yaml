@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  debt-away
+
+  Sample SAM Template for debt-away
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    LoggingConfig:
+      LogFormat: JSON
+
+Parameters:
+  PlaidClientId:
+    Type: String
+  PlaidSecret:
+    Type: String
+  PlaidEnv:
+    Type: String
+  ExprianUsername:
+    Type: String
+  ExperianPassword:
+    Type: String
+  ExperianClientId:
+    Type: String
+  ExperianSecret:
+    Type: String
+
+
+Resources:
+  ApiGatewayApi:
+      Type: AWS::Serverless::Api
+      Properties:
+        StageName: prod
+        Cors:
+          AllowOrigins:
+            - "http://localhost:3000"
+            - "https://main.d3a19hn400g7xw.amplifyapp.com"
+          AllowMethods:
+            - OPTIONS
+            - POST
+            - GET 
+          AllowHeaders:
+            - Content-Type
+            - Authorization
+          AllowCredentials: true
+          #AllowOrigins: "'http://127.0.0.1:3000', 'http://localhost:3000'"
+          #AllowMethods: "'OPTIONS,POST,GET'"
+          #AllowHeaders: "'Content-Type,Authorization'"
+  UnifiedApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: api/
+      Handler: app.handler
+      Runtime: python3.13
+      Architectures:
+        - x86_64
+      Events:
+        UnifiedApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /{proxy+} # Match all routes
+            Method: ANY
+      Environment:
+        Variables:
+          PLAID_CLIENT_ID: !Ref PlaidClientId
+          PLAID_SECRET: !Ref PlaidSecret
+          PLAID_ENV: !Ref PlaidEnv
+          EXPERIAN_USERNAME: !Ref ExprianUsername
+          EXPERIAN_PASSWORD: !Ref ExperianPassword
+          EXPERIAN_CLIENT_ID: !Ref ExperianClientId
+          EXPERIAN_SECRET: !Ref ExperianSecret
+
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  UnifiedApiFunctionApi:
+    Description: API Gateway endpoint URL for Prod stage for Unified API
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+  UnifiedApiFunction:
+    Description: Unified Lambda Function ARN
+    Value: !GetAtt UnifiedApiFunctionRole.Arn
+  UnifiedApiFunctionRole:
+    Description: Implicit IAM Role created for Unified function
+    Value: !GetAtt UnifiedApiFunctionRole.Arn

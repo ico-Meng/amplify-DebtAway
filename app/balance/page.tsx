@@ -79,7 +79,6 @@ function BalancePageContent() {
     console.log("client_id = ", client_id)
 
     useEffect(() => {
-        console.log("icoico in balance")
         const data = localStorage.getItem('accountBalance');
         if (data) {
             const parsedData: ResponseData = JSON.parse(data);
@@ -105,10 +104,6 @@ function BalancePageContent() {
     return (
         <div
             style={{
-                //background: "linear-gradient(to right, #f0f4f8, #d9e6f2)", // Gradient background
-                //minHeight: "100vh",
-                //padding: "20px",
-                //fontFamily: "Arial, sans-serif",
                 background: "linear-gradient(to right, #f0f4f8, #d9e6f2)", // Gradient background
                 minHeight: "100vh",
                 padding: "20px",

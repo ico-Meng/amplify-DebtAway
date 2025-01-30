@@ -1,0 +1,5 @@
+boto3
+requests
+fastapi
+mangum
+plaid-python==27.0.0

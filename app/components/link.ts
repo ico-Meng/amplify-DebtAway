@@ -131,7 +131,7 @@ export const PlaidIntegration: React.FC<PlaidIntegrationProps> = ({
                 const data = await response.json();
                 console.log("Access Token Response:", data);
 
-                localStorage.setItem("accountAccess", JSON.stringify(data));
+                //localStorage.setItem("accountAccess", JSON.stringify(data));
 
             } catch (error) {
                 console.error("Error exchanging public token:", error);
@@ -198,13 +198,13 @@ export async function getAccount({
         const response = await fetch(apiEndpoint, {
             method: 'GET',
         });
-        console.log("icoico: response = ", response);
+        console.log("response = ", response);
 
         const data = await response.json();
-        console.log("icoico: data = ", data);
+        console.log("data = ", data);
 
         localStorage.setItem('accountBalance', JSON.stringify(data));
-        console.log("icoico: accountBalance = ", localStorage.getItem('accountBalance'));
+        console.log("accountBalance = ", localStorage.getItem('accountBalance'));
 
         router.push(`/balance?client_id=${queryParams}`); // Navigate to the balance page
     }
@@ -228,7 +228,7 @@ export async function testicoicoapi() {
             throw new Error(`Failed to test-api: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("icoico: response = ", data);
+        console.log("response = ", data);
     }
     catch (error) {
         console.error("Failed to fetch accountBalance:", error);
@@ -260,13 +260,9 @@ export async function testapi({
         if (!response.ok) {
             throw new Error(`Failed to test-api: ${response.statusText}`);
         }
-        console.log("icoico: response = ", response);
+        console.log("response = ", response);
         const data = await response.json();
-        console.log("icoico: data = ", data);
-
-        localStorage.setItem('accountBalance', JSON.stringify(data));
-        console.log("icoico: accountBalance = ", localStorage.getItem('accountBalance'));
-
+        console.log("data = ", data);
         //const queryParams = new URLSearchParams({ userId: userId ?? "" }).toString();
         //router.push(`/balance?client_id=${queryParams}`); // Navigate to the balance page
     }
@@ -283,7 +279,7 @@ export async function creditapi({
     /**
      * Should pass in Experian required user data from form page
      */
-    console.log("icoico creditapi")
+    console.log("creditapi")
     try {
         const apiEndpoint = "http://127.0.0.1:3000/get-credit-report";
         const response = await fetch(apiEndpoint, { method: 'GET' });
@@ -292,7 +288,7 @@ export async function creditapi({
             throw new Error(`Failed to fetch link token: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("icoico: data = ", data);
+        console.log("data = ", data);
 
         /**
          * Format response data, redirect and pass down to Debt Status page
