@@ -18,16 +18,22 @@ import {
   testicoicoapi
 } from "@/app/components/link";
 
+import { API_ENDPOINT } from "./components/config";
+
 Amplify.configure(outputs);
 
 
 export default function App() {
+  const [prodEnv, setProdEnv] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [publicToken, setPublicToken] = useState<string | null>(null);
   const [clientId, setClientId] = useState<string | null>(null);
   const [openPlaidLink, setOpenPlaidLink] = useState<(() => void) | null>(null);
   const [isPlaidReady, setIsPlaidReady] = useState(false);
+
+  console.log("environment = ", process.env.NODE_ENV);// value is "development" if local
+  console.log("API_ENDPOINT = ", API_ENDPOINT);
 
   const router = useRouter();
 

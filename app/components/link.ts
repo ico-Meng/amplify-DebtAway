@@ -4,6 +4,7 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { usePlaidLink } from "react-plaid-link";
+import { API_ENDPOINT } from "./config";
 import React from "react";
 
 export const UserProfile = ({
@@ -72,12 +73,12 @@ export const PlaidIntegration: React.FC<PlaidIntegrationProps> = ({
             try {
                 console.log("================")
                 console.log("userId: ", userId)
-                const apiEndpoint = "http://127.0.0.1:3000/create-link-token"; // Replace with your actual API Gateway endpoint
+                const apiEndpoint = `${API_ENDPOINT}/create-link-token`;
+                //const apiEndpoint = "https://jb6jiia3k6.execute-api.us-east-1.amazonaws.com/prod/create-link-token";
                 const response = await fetch(apiEndpoint, {
                     method: "POST",
-                    //headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ userId }), // Send userId in request body
-                    //mode: "no-cors"
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId }),
                 });
 
                 if (!response.ok) {
@@ -113,10 +114,10 @@ export const PlaidIntegration: React.FC<PlaidIntegrationProps> = ({
 
             // Send the public token to your Lambda backend to exchange for an access token
             try {
-                const apiEndpoint = "http://127.0.0.1:3000/exchange-public-token";
+                const apiEndpoint = `${API_ENDPOINT}/exchange-public-token`;
                 const response = await fetch(apiEndpoint, {
                     method: "POST",
-                    //headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         publicToken: publicToken,
                         linkToken: linkToken,
@@ -194,9 +195,10 @@ export async function getAccount({
             clientId: clientId ?? "",
             linkToken: linkToken ?? ""
         }).toString();
-        const apiEndpoint = `http://127.0.0.1:3000/get-account?${queryParams}`;
+        const apiEndpoint = `${API_ENDPOINT}/get-account?${queryParams}`;
         const response = await fetch(apiEndpoint, {
             method: 'GET',
+            headers: { "Content-Type": "application/json" },
         });
         console.log("response = ", response);
 
@@ -216,12 +218,12 @@ export async function getAccount({
 
 export async function testicoicoapi() {
     try {
-        const apiEndpoint = "http://127.0.0.1:3000/test2-api";
+        const apiEndpoint = `${API_ENDPOINT}/test2-api`;
         const response = await fetch(apiEndpoint, {
             method: 'GET',
-            //headers: {
-            //    "Content-Type": "application/json",
-            //},
+            headers: {
+                "Content-Type": "application/json",
+            },
             //credentials: "include",
         });
         if (!response.ok) {
@@ -250,12 +252,10 @@ export async function testapi({
             linkToken: linkToken ?? "",
             publicToken: publicToken ?? ""
         }).toString();
-        const apiEndpoint = `http://127.0.0.1:3000/test-api?${queryParams}`;
+        const apiEndpoint = `${API_ENDPOINT}/test-api?${queryParams}`;
         const response = await fetch(apiEndpoint, {
             method: 'GET',
-            //headers: {
-            //    "Content-Type": "application/json",
-            //},
+            headers: { "Content-Type": "application/json" },
         });
         if (!response.ok) {
             throw new Error(`Failed to test-api: ${response.statusText}`);
@@ -281,8 +281,11 @@ export async function creditapi({
      */
     console.log("creditapi")
     try {
-        const apiEndpoint = "http://127.0.0.1:3000/get-credit-report";
-        const response = await fetch(apiEndpoint, { method: 'GET' });
+        const apiEndpoint = `${API_ENDPOINT}/get-credit-report`;
+        const response = await fetch(apiEndpoint, {
+            method: 'GET',
+            headers: { "Content-Type": "application/json" },
+        });
 
         if (!response.ok) {
             throw new Error(`Failed to fetch link token: ${response.statusText}`);

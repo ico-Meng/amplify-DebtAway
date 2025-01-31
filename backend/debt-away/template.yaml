@@ -35,20 +35,10 @@ Resources:
       Properties:
         StageName: prod
         Cors:
-          AllowOrigins:
-            - "http://localhost:3000"
-            - "https://main.d3a19hn400g7xw.amplifyapp.com"
-          AllowMethods:
-            - OPTIONS
-            - POST
-            - GET 
-          AllowHeaders:
-            - Content-Type
-            - Authorization
-          AllowCredentials: true
-          #AllowOrigins: "'http://127.0.0.1:3000', 'http://localhost:3000'"
-          #AllowMethods: "'OPTIONS,POST,GET'"
-          #AllowHeaders: "'Content-Type,Authorization'"
+          AllowOrigin: "'*'"
+          AllowMethods: "'OPTIONS,POST,GET'"
+          AllowHeaders: "'Content-Type,Authorization'"
+          AllowCredentials: "'true'"
   UnifiedApiFunction:
     Type: AWS::Serverless::Function
     Properties:
