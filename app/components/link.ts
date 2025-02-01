@@ -65,16 +65,9 @@ export const PlaidIntegration: React.FC<PlaidIntegrationProps> = ({
             console.log("clientId: ", clientId)
             console.log("linkToken: ", linkToken)
 
-            //if (!userId || linkToken) {
-            //    console.log("UserId is not set yet or linkToken is already fetched.");
-            //    return;
-            //}
-
             try {
-                console.log("================")
                 console.log("userId: ", userId)
                 const apiEndpoint = `${API_ENDPOINT}/create-link-token`;
-                //const apiEndpoint = "https://jb6jiia3k6.execute-api.us-east-1.amazonaws.com/prod/create-link-token";
                 const response = await fetch(apiEndpoint, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -100,7 +93,7 @@ export const PlaidIntegration: React.FC<PlaidIntegrationProps> = ({
             }
         };
         fetchLinkToken();
-    }, [userId, /*setClientId, setLinkToken, clientId,*/ linkToken]); // Re-run effect when userId or linkToken changes
+    }, [userId, linkToken]); // Re-run effect when userId or linkToken changes
 
 
     // Initialize Plaid Link with the link token
@@ -131,9 +124,6 @@ export const PlaidIntegration: React.FC<PlaidIntegrationProps> = ({
 
                 const data = await response.json();
                 console.log("Access Token Response:", data);
-
-                //localStorage.setItem("accountAccess", JSON.stringify(data));
-
             } catch (error) {
                 console.error("Error exchanging public token:", error);
             }
@@ -189,7 +179,6 @@ export async function getAccount({
     console.log("clientId: ", clientId)
     console.log("linkToken: ", linkToken)
 
-    //const router = useRouter(); // For navigation
     try {
         const queryParams = new URLSearchParams({
             clientId: clientId ?? "",
@@ -265,39 +254,6 @@ export async function testapi({
         console.log("data = ", data);
         //const queryParams = new URLSearchParams({ userId: userId ?? "" }).toString();
         //router.push(`/balance?client_id=${queryParams}`); // Navigate to the balance page
-    }
-    catch (error) {
-        console.error("Failed to fetch accountBalance:", error);
-    }
-}
-
-export async function creditapi({
-    router
-}: {
-    router: ReturnType<typeof useRouter>;
-}) {
-    /**
-     * Should pass in Experian required user data from form page
-     */
-    console.log("creditapi")
-    try {
-        const apiEndpoint = `${API_ENDPOINT}/get-credit-report`;
-        const response = await fetch(apiEndpoint, {
-            method: 'GET',
-            headers: { "Content-Type": "application/json" },
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch link token: ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log("data = ", data);
-
-        /**
-         * Format response data, redirect and pass down to Debt Status page
-         */
-
-        router.push("/debtstatus");
     }
     catch (error) {
         console.error("Failed to fetch accountBalance:", error);

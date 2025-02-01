@@ -2,17 +2,53 @@
 
 import { Button, View, Heading, Flex, TextField, ThemeProvider, Theme } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { creditapi } from "@/app/components/link";
 import { useRouter } from 'next/navigation';
+import { useState, useTransition } from "react";
+import { API_ENDPOINT } from "@/app/components/config";
 
 export default function FormPage() {
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [isPending, startTransition] = useTransition(); // Ensures async transition
+
     const handleSubmit = (event: {
         currentTarget: HTMLFormElement | undefined; preventDefault: () => void
     }) => {
         event.preventDefault();
         console.log("Form submitted");
     };
+
+    const creditapihandler = () => {
+        console.log("creditapi")
+        setLoading(true);
+        startTransition(async () => {
+            try {
+                const apiEndpoint = `${API_ENDPOINT}/get-credit-report`;
+                const response = await fetch(apiEndpoint, {
+                    method: 'GET',
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch link token: ${response.statusText}`);
+                }
+                const data = await response.json();
+                console.log("data = ", data);
+
+                /**
+                 * Format response data, redirect and pass down to Debt Status page
+                 */
+
+                router.push("/debtstatus");
+            }
+            catch (error) {
+                console.error("Failed to fetch accountBalance:", error);
+            }
+            finally {
+                setLoading(false);
+            }
+        });
+    }
 
     return (
         <ThemeProvider>
@@ -124,8 +160,9 @@ export default function FormPage() {
                                     Back
                                 </Button>
                                 <Button
-                                    onClick={() => creditapi({ router })}
+                                    onClick={creditapihandler}
                                     variation="primary" // Correct prop for Amplify Button
+                                    disabled={loading || isPending} // Disable during loading
                                     style={{
                                         position: "fixed",
                                         bottom: "20px",
@@ -134,7 +171,7 @@ export default function FormPage() {
                                         color: "#fff",
                                     }}
                                 >
-                                    Pull Debt
+                                    {loading || isPending ? "Loading..." : "Pull Debt"}
                                 </Button>
                             </Flex>
                         </Flex>

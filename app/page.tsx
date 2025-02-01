@@ -18,7 +18,7 @@ import {
   testicoicoapi
 } from "@/app/components/link";
 
-import { API_ENDPOINT } from "./components/config";
+import Image from "next/image";
 
 Amplify.configure(outputs);
 
@@ -31,9 +31,6 @@ export default function App() {
   const [clientId, setClientId] = useState<string | null>(null);
   const [openPlaidLink, setOpenPlaidLink] = useState<(() => void) | null>(null);
   const [isPlaidReady, setIsPlaidReady] = useState(false);
-
-  console.log("environment = ", process.env.NODE_ENV);// value is "development" if local
-  console.log("API_ENDPOINT = ", API_ENDPOINT);
 
   const router = useRouter();
 
@@ -72,6 +69,12 @@ export default function App() {
               setUserId={setUserId}
             />
           </div>
+          <Image
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/800px-Bitcoin.svg.png"
+            alt="Picture of the bitcoin"
+            width={50}
+            height={50}
+          />
           <br />
           <div>
             <PlaidIntegration
@@ -109,6 +112,9 @@ export default function App() {
           <br />
           <br />
           <button onClick={signOut}>Sign out</button>
+
+
+
         </main>
       )
       }

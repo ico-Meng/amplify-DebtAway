@@ -22,6 +22,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from config import PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENV
 
+from aws_lambda_powertools import Logger
+
 
 # Global Variable Cache
 # dynamodb = boto3.resource(
@@ -75,6 +77,8 @@ from config import PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENV
 #
 # PlaidTokenTable = ensure_table_exists()
 
+logger = Logger()
+
 plaid_env = plaid.Environment.Sandbox if PLAID_ENV == "sandbox" else (
     plaid.Environment.Development if PLAID_ENV == "development" else plaid.Environment.Production
 )
@@ -114,7 +118,7 @@ app.add_middleware(
 
 @app.middleware("http")
 async def log_requests(request, call_next):
-    print(f"Incoming request: {request.method} {request.url}")
+    logger.info(f"Incoming request: {request.method} {request.url}")
     response = await call_next(request)
     return response
 
@@ -124,7 +128,6 @@ async def create_link_token(request: Request):
     body = await request.json()
     user_id = body.get("userId")
     client_id = user_id
-    print(f"client_id: {client_id}")
 
     try:
         # Generate a link_token
@@ -142,7 +145,7 @@ async def create_link_token(request: Request):
         )
         response = plaid_client.link_token_create(link_request)
         link_token = response["link_token"]
-        print("link_token: ", link_token)
+        logger.info(f"client_id: {client_id}; link_token: {link_token}")
 
         # Should check availability first, then see if need to update
         # try:
@@ -189,7 +192,6 @@ async def create_link_token(request: Request):
 async def exchange_public_token(request: Request):
     body = await request.json()
     client_id = body.get("clientId")  # Extract the clientId
-    print("client_id: ", client_id)
 
     global access_token
     public_token = body.get('publicToken')
@@ -202,6 +204,8 @@ async def exchange_public_token(request: Request):
 
     access_token = response['access_token']
     item_id = response['item_id']
+
+    logger.info(f"client_id: {client_id}; access_token: {access_token}")
 
     # try:
     #    dbResp = PlaidTokenTable.update_item(
@@ -263,7 +267,7 @@ async def get_account(
     # print("link_token: ", link_token)
 
     global access_token
-    print("get-account access_token = ", access_token)
+    logger.info(f"get-account access_token: {access_token}")
     # dbResp = PlaidTokenTable.get_item(
     #    Key={
     #        "client_id": clientId,
@@ -284,7 +288,7 @@ async def get_account(
     )
     accounts_response = plaid_client.accounts_get(request)
     accounts_response_dict = accounts_response.to_dict()
-    print("account response: ", accounts_response_dict)
+    logger.info(f"account response: {accounts_response_dict}")
     return {"status": "success", "account": accounts_response_dict}
     # return {
     #    "statusCode": 200,
