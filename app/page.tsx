@@ -14,7 +14,6 @@ import {
   PlaidIntegration,
   getAccount,
   testapi,
-  creditapi,
   testicoicoapi
 } from "@/app/components/link";
 
