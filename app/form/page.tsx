@@ -63,7 +63,8 @@ export default function FormPage() {
                     <br />
                     <br />
                     <form onSubmit={handleSubmit}>
-                        <Flex direction="column" gap="1rem">
+                        <Flex direction="column" gap="1rem"
+                            className={`${loading || isPending ? "pointer-events-none opacity-50" : ""}`}>
                             <Flex gap="1rem" justifyContent="space-between">
                                 <TextField
                                     label="First Name"
@@ -71,9 +72,13 @@ export default function FormPage() {
                                     placeholder="Enter your first name"
                                     required
                                     width="48%" // Adjust width to make it fit in one row
+                                    disabled={loading || isPending}
                                     style={{
                                         borderWidth: "2px",
                                         borderColor: "#444444",
+                                        backgroundColor: loading || isPending ? "#909090" : "",
+                                        color: "black",
+                                        cursor: loading || isPending ? "not-allowed" : ""
                                     }}
                                 />
                                 <TextField
@@ -85,6 +90,9 @@ export default function FormPage() {
                                     style={{
                                         borderWidth: "2px",
                                         borderColor: "#444444",
+                                        backgroundColor: loading || isPending ? "#909090" : "",
+                                        color: "black",
+                                        cursor: loading || isPending ? "not-allowed" : ""
                                     }}
                                 />
                             </Flex>
@@ -96,6 +104,9 @@ export default function FormPage() {
                                 style={{
                                     borderWidth: "2px",
                                     borderColor: "#444444",
+                                    backgroundColor: loading || isPending ? "#909090" : "",
+                                    color: "black",
+                                    cursor: loading || isPending ? "not-allowed" : ""
                                 }}
                             />
                             <TextField
@@ -105,6 +116,9 @@ export default function FormPage() {
                                 style={{
                                     borderWidth: "2px",
                                     borderColor: "#444444",
+                                    backgroundColor: loading || isPending ? "#909090" : "",
+                                    color: "black",
+                                    cursor: loading || isPending ? "not-allowed" : ""
                                 }}
                             />
                             <Flex gap="1rem" justifyContent="space-between">
@@ -117,6 +131,9 @@ export default function FormPage() {
                                     style={{
                                         borderWidth: "2px",
                                         borderColor: "#444444",
+                                        backgroundColor: loading || isPending ? "#909090" : "",
+                                        color: "black",
+                                        cursor: loading || isPending ? "not-allowed" : ""
                                     }}
                                 />
                                 <TextField
@@ -128,6 +145,9 @@ export default function FormPage() {
                                     style={{
                                         borderWidth: "2px",
                                         borderColor: "#444444",
+                                        backgroundColor: loading || isPending ? "#909090" : "",
+                                        color: "black",
+                                        cursor: loading || isPending ? "not-allowed" : ""
                                     }}
                                 />
                             </Flex>
@@ -141,6 +161,9 @@ export default function FormPage() {
                                 style={{
                                     borderWidth: "2px",
                                     borderColor: "#444444",
+                                    backgroundColor: loading || isPending ? "#909090" : "",
+                                    color: "black",
+                                    cursor: loading || isPending ? "not-allowed" : ""
                                 }}
                             />
                             <Flex justifyContent="flex-start" style={{ marginTop: "20px" }}>
@@ -155,6 +178,7 @@ export default function FormPage() {
                                         left: "20px",
                                         backgroundColor: "#333",
                                         color: "#fff",
+                                        cursor: loading || isPending ? "not-allowed" : ""
                                     }}
                                 >
                                     Back
