@@ -23,7 +23,6 @@ Amplify.configure(outputs);
 
 
 export default function App() {
-  const [prodEnv, setProdEnv] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [publicToken, setPublicToken] = useState<string | null>(null);
@@ -56,7 +55,18 @@ export default function App() {
     <Authenticator>
       {({ signOut, user }) => (
         <main>
-          <h1 style={{ textAlign: 'center' }}>Debt Away</h1>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+            <Image
+              src="https://www.lssmn.org/financialcounseling/sites/financialcounseling/files/styles/blog_feature_763x476/public/blog/2023-07/Adobe_Financial_275699405%20resize.jpeg?itok=q5DOZBTS"
+              alt="Debt Management Plan"
+              width={300}
+              height={180}
+              style={{ borderRadius: "5px", justifyContent: "center", }}
+            />
+          </div>
+          <br />
+          <br />
+          <h1 style={{ margin: 0, textAlign: 'center' }}>Debt Away</h1>
           <div
             style={{
               fontSize: "1.5em", // Make it bigger
@@ -68,12 +78,6 @@ export default function App() {
               setUserId={setUserId}
             />
           </div>
-          <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/800px-Bitcoin.svg.png"
-            alt="Picture of the bitcoin"
-            width={50}
-            height={50}
-          />
           <br />
           <div>
             <PlaidIntegration
@@ -107,7 +111,9 @@ export default function App() {
           <br />
           <br />
           <br />
-          <button onClick={() => testicoicoapi()}>Test</button>
+          {process.env.NODE_ENV === "development" && (
+            <button onClick={() => testicoicoapi()}>Test</button>
+          )}
           <br />
           <br />
           <button onClick={signOut}>Sign out</button>
