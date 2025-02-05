@@ -19,6 +19,8 @@ import {
 
 import Image from "next/image";
 
+import ChatUI from "@/app/components/ChatUI";
+
 Amplify.configure(outputs);
 
 
@@ -109,6 +111,10 @@ export default function App() {
           <button onClick={handleGetAccount}>Bank Account</button>
 
           <br />
+          <br />
+          <div>
+            <ChatUI />
+          </div>
           <br />
           <br />
           {process.env.NODE_ENV === "development" && (
