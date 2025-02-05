@@ -23,6 +23,11 @@ import ChatUI from "@/app/components/ChatUI";
 
 Amplify.configure(outputs);
 
+// Define an interface for the render prop
+interface AuthenticatorRenderProps {
+  signOut: () => void;
+  user: any; // Replace 'any' with the correct type if available (e.g., AmplifyUser)
+}
 
 export default function App() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -52,10 +57,9 @@ export default function App() {
   };
 
 
-
   return (
     <Authenticator>
-      {({ signOut, user }) => (
+      {({ signOut, user }: AuthenticatorRenderProps) => (
         <main>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
             <Image
