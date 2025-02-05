@@ -14,6 +14,7 @@ const ChatUI: React.FC = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text }),
             });
+
             console.log("chatUI 2");
 
             if (!res.ok) throw new Error("Failed to fetch AI response");
