@@ -59,33 +59,28 @@ export default function App() {
 
   return (
     <Authenticator>
-      {({ signOut, user }: AuthenticatorRenderProps) => (
-        <main>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-            <Image
-              src="https://www.lssmn.org/financialcounseling/sites/financialcounseling/files/styles/blog_feature_763x476/public/blog/2023-07/Adobe_Financial_275699405%20resize.jpeg?itok=q5DOZBTS"
-              alt="Debt Management Plan"
-              width={300}
-              height={180}
-              style={{ borderRadius: "5px", justifyContent: "center", }}
-            />
-          </div>
-          <br />
-          <br />
-          <h1 style={{ margin: 0, textAlign: 'center' }}>Debt Away</h1>
-          <div
-            style={{
-              fontSize: "1.5em", // Make it bigger
-              color: "#000000", // Sea color (Sea Green)
-            }}
-          >
-            <UserProfile
-              userId={userId}
-              setUserId={setUserId}
-            />
-          </div>
-          <br />
-          <div>
+      {(props) => {
+        const signOut = props.signOut || (() => { }); // Ensure signOut is always a function
+        const user = props.user;
+
+        return (
+          <main>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+              <Image
+                src="https://www.lssmn.org/financialcounseling/sites/financialcounseling/files/styles/blog_feature_763x476/public/blog/2023-07/Adobe_Financial_275699405%20resize.jpeg?itok=q5DOZBTS"
+                alt="Debt Management Plan"
+                width={300}
+                height={180}
+                style={{ borderRadius: "5px", justifyContent: "center" }}
+              />
+            </div>
+            <br />
+            <h1 style={{ margin: 0, textAlign: 'center' }}>Debt Away</h1>
+
+            <UserProfile userId={userId} setUserId={setUserId} />
+            <br />
+            <br />
+
             <PlaidIntegration
               userId={userId}
               setUserId={setUserId}
@@ -100,39 +95,109 @@ export default function App() {
             <button onClick={() => openPlaidLink && openPlaidLink()} disabled={!isPlaidReady}>
               Link with Plaid
             </button>
-          </div>
-          <div>
-            🥳 Fetch your bank account with Plaid
-          </div>
-          <br />
-          <button
-            onClick={handleDebtFormRedirect}
-            className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none" >
-            Debt Analysis
-          </button>
+            <div>🥳 Fetch your bank account with Plaid</div>
+            <br />
 
-          <br />
-          <button onClick={handleGetAccount}>Bank Account</button>
+            <button
+              onClick={handleDebtFormRedirect}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none">
+              Debt Analysis
+            </button>
 
-          <br />
-          <br />
-          <div>
+            <br />
+            <button onClick={handleGetAccount}>Bank Account</button>
+
+            <br />
             <ChatUI />
-          </div>
-          <br />
-          <br />
-          {process.env.NODE_ENV === "development" && (
-            <button onClick={() => testicoicoapi()}>Test</button>
-          )}
-          <br />
-          <br />
-          <button onClick={signOut}>Sign out</button>
+            <br />
 
+            {process.env.NODE_ENV === "development" && (
+              <button onClick={() => testicoicoapi()}>Test</button>
+            )}
 
-
-        </main>
-      )
-      }
-    </Authenticator >
+            <br />
+            <button onClick={signOut}>Sign out</button>
+          </main>
+        );
+      }}
+    </Authenticator>
+    /*
+      <Authenticator>
+        {({ signOut, user }: AuthenticatorRenderProps) => (
+          <main>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+              <Image
+                src="https://www.lssmn.org/financialcounseling/sites/financialcounseling/files/styles/blog_feature_763x476/public/blog/2023-07/Adobe_Financial_275699405%20resize.jpeg?itok=q5DOZBTS"
+                alt="Debt Management Plan"
+                width={300}
+                height={180}
+                style={{ borderRadius: "5px", justifyContent: "center", }}
+              />
+            </div>
+            <br />
+            <br />
+            <h1 style={{ margin: 0, textAlign: 'center' }}>Debt Away</h1>
+            <div
+              style={{
+                fontSize: "1.5em", // Make it bigger
+                color: "#000000", // Sea color (Sea Green)
+              }}
+            >
+              <UserProfile
+                userId={userId}
+                setUserId={setUserId}
+              />
+            </div>
+            <br />
+            <div>
+              <PlaidIntegration
+                userId={userId}
+                setUserId={setUserId}
+                clientId={clientId}
+                setClientId={setClientId}
+                linkToken={linkToken}
+                setLinkToken={setLinkToken}
+                publicToken={publicToken}
+                setPublicToken={setPublicToken}
+                onOpen={handlePlaidOpen}
+              />
+              <button onClick={() => openPlaidLink && openPlaidLink()} disabled={!isPlaidReady}>
+                Link with Plaid
+              </button>
+            </div>
+            <div>
+              🥳 Fetch your bank account with Plaid
+            </div>
+            <br />
+            <button
+              onClick={handleDebtFormRedirect}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none" >
+              Debt Analysis
+            </button>
+  
+            <br />
+            <button onClick={handleGetAccount}>Bank Account</button>
+  
+            <br />
+            <br />
+            <div>
+              <ChatUI />
+            </div>
+            <br />
+            <br />
+            {process.env.NODE_ENV === "development" && (
+              <button onClick={() => testicoicoapi()}>Test</button>
+            )}
+            <br />
+            <br />
+            <button onClick={signOut}>Sign out</button>
+  
+  
+  
+          </main>
+        )
+        }
+      </Authenticator >
+    */
   );
 }
