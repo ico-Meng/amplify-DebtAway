@@ -56,6 +56,10 @@ export default function App() {
     router.push("/form");
   };
 
+  const handleChatRedirect = () => {
+    router.push("/chat");
+  };
+
 
   return (
     <Authenticator>
@@ -109,6 +113,13 @@ export default function App() {
 
             <br />
             <ChatUI />
+            <br />
+
+            <button
+              onClick={handleChatRedirect}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none">
+              Chat AI
+            </button>
             <br />
 
             {process.env.NODE_ENV === "development" && (
