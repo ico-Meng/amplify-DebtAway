@@ -211,9 +211,9 @@ export async function testicoicoapi() {
         const apiEndpoint = `${API_ENDPOINT}/chat-deepseek`;
         const response = await fetch(apiEndpoint, {
             method: 'POST',
-            //headers: {
-            //    "Content-Type": "application/json",
-            //},
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({
                 chatContent: "How can I analyze my bank credit history?",
             }),

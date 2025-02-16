@@ -28,7 +28,7 @@ export default function ChatPage() {
       const apiEndpoint = `${API_ENDPOINT}/chat-deepseek`;
       const response = await fetch(apiEndpoint, {
         method: "POST",
-        //headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chatContent: input }),
       });
 
